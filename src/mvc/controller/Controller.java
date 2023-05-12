@@ -1,6 +1,7 @@
 package mvc.controller;
 
 import mvc.models.Client;
+import mvc.models.DatabaseConnection;
 import mvc.models.Order;
 import mvc.models.Product;
 import mvc.view.View;
@@ -13,12 +14,16 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Field;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Vector;
 
 public class Controller {
 
     private View view;
+    private DatabaseConnection databaseConnection;
     private ViewClient viewClient;
     private ViewOrder viewOrder;
     private ViewProduct viewProduct;
@@ -26,8 +31,10 @@ public class Controller {
 
 
 
-    public Controller(View view) {
+    public Controller(View view, DatabaseConnection databaseConnection) {
         this.view = view;
+        this.databaseConnection = databaseConnection;
+
         this.view.addOrderListener(new OrderListener());
         this.view.addProductListener(new ProductListener());
         this.view.addClientListener(new ClientListener());
@@ -196,6 +203,7 @@ public class Controller {
             ArrayList<Client> clients;
             clients = getClients();
 
+            System.out.println(clients.size());
 
             JTable table = viewClient.getTable();
             populateTheTabel(table, clients);
@@ -205,14 +213,43 @@ public class Controller {
     {
         ArrayList<Client> clienti = new ArrayList<>();
 
-        clienti.add(new Client(1,"Mama" ,10, "aici"));
-        clienti.add(new Client(2, "Andrei", 15, "la tine"));
-        clienti.add(new Client(3, "David", 70, "la mine"));
+//        clienti.add(new Client(1,"Mama" ,10, "aici"));
+//        clienti.add(new Client(2, "Andrei", 15, "la tine"));
+//        clienti.add(new Client(3, "David", 70, "la mine"));
+//
+//        ///to check scroll works
+//        for (int i = 4; i<= 150; i++)
+//        {
+//            clienti.add(new Client(i, "Andrei" + i, 10 * i, "ceva"));
+//        }
 
-        ///to check scroll works
-        for (int i = 4; i<= 150; i++)
+        try{
+            Connection connection = databaseConnection.getConnection();
+            String sql = "SELECT * FROM client";
+            Statement statement = connection.createStatement();
+            ResultSet result = statement.executeQuery(sql);
+
+            String name = new String();
+            String address = new String();
+            int id;
+            int age;
+
+            while (result.next())
+            {
+                id = Integer.parseInt(result.getString(1));
+                name = result.getString(2);
+                age = Integer.parseInt(result.getString(3));
+                address = result.getString(4);
+
+                clienti.add(new Client(id, name, age, address));
+            }
+
+
+
+        }
+        catch (Exception ex)
         {
-            clienti.add(new Client(i, "Andrei" + i, 10 * i, "ceva"));
+            System.out.println("EROARE EXCEPTION!");
         }
 
         return clienti;
@@ -261,5 +298,5 @@ public class Controller {
         }
     }
 
-    
+
 }
