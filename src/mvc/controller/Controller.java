@@ -77,33 +77,8 @@ public class Controller {
         public void actionPerformed(ActionEvent e) {
             ///show the products
             JTable table = viewProduct.getTable();
-            DefaultTableModel model = new DefaultTableModel();
-            table.setModel(model);
-
             ArrayList<Product> products = getProducts();
-            // Extract column names using reflection
-            Class<?> clazz = products.get(0).getClass();
-            Field[] fields = clazz.getDeclaredFields();
-            for (Field field : fields) {
-                String name = field.getName();
-                model.addColumn(name);
-            }
-
-            // Populate the table with data
-            for (Object obj : products) {
-                Vector<Object> row = new Vector<>();
-                for (Field field : fields) {
-                    field.setAccessible(true);
-                    try {
-                        Object value = field.get(obj);
-                        row.add(value);
-                    } catch (IllegalAccessException exception) {
-                        exception.printStackTrace();
-                    }
-                }
-                model.addRow(row);
-            }
-
+            populateTheTabel(table, products);
         }
     }
     ArrayList<Product> getProducts()
@@ -143,9 +118,17 @@ public class Controller {
             viewOrder.setVisible(true);
 
             viewOrder.viewOrders(new OrderViewListener());
+            viewOrder.createOrder(new OrderCreateListener());
         }
     }
+    class OrderCreateListener implements ActionListener
+    {
 
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            System.out.println("CREATE ORDER!");
+        }
+    }
 
     class OrderViewListener implements ActionListener
     {
@@ -153,37 +136,8 @@ public class Controller {
         @Override
         public void actionPerformed(ActionEvent e) {
             ArrayList<Order> orders = getOrders();
-
             JTable table = viewOrder.getTable();
-            DefaultTableModel model = new DefaultTableModel();
-            table.setModel(model);
-
-
-            Class<?> clazz = orders.get(0).getClass();
-            Field[] fields = clazz.getDeclaredFields();
-
-            ///makes the header
-            for (Field field : fields) {
-                String name = field.getName();
-                model.addColumn(name);
-            }
-
-            ///populate the table with clients
-            for (Object obj : orders)
-            {
-                Vector<Object> row = new Vector<>();
-                for (Field field : fields) {
-                    field.setAccessible(true);
-                    try {
-                        Object value = field.get(obj);
-                        row.add(value);
-                    } catch (IllegalAccessException exception) {
-                        exception.printStackTrace();
-                    }
-                }
-                model.addRow(row);
-            }
-
+            populateTheTabel(table, orders);
         }
     }
     ArrayList<Order> getOrders()
@@ -196,6 +150,9 @@ public class Controller {
 
         return orders;
     }
+
+
+
 
 
 
@@ -241,63 +198,7 @@ public class Controller {
 
 
             JTable table = viewClient.getTable();
-            DefaultTableModel model = new DefaultTableModel();
-            table.setModel(model);
-
-
-            Class<?> clazz = clients.get(0).getClass();
-            Field[] fields = clazz.getDeclaredFields();
-
-            ///makes the header
-            for (Field field : fields) {
-                String name = field.getName();
-                model.addColumn(name);
-            }
-
-            ///populate the table with clients
-            for (Object obj : clients)
-            {
-                Vector<Object> row = new Vector<>();
-                for (Field field : fields) {
-                    field.setAccessible(true);
-                    try {
-                        Object value = field.get(obj);
-                        row.add(value);
-                    } catch (IllegalAccessException exception) {
-                        exception.printStackTrace();
-                    }
-                }
-                model.addRow(row);
-            }
-
-
-//            DefaultTableModel model = new DefaultTableModel();
-//            table.setModel(model);
-//
-//            // Extract column names using reflection
-//            Class<?> clazz = list.get(0).getClass();
-//            Field[] fields = clazz.getDeclaredFields();
-//            for (Field field : fields) {
-//                String name = field.getName();
-//                model.addColumn(name);
-//            }
-//
-//            // Populate the table with data
-//            for (Object obj : list) {
-//                Vector<Object> row = new Vector<>();
-//                for (Field field : fields) {
-//                    field.setAccessible(true);
-//                    try {
-//                        Object value = field.get(obj);
-//                        row.add(value);
-//                    } catch (IllegalAccessException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//                model.addRow(row);
-//            }
-
-
+            populateTheTabel(table, clients);
         }
     }
     ArrayList<Client> getClients()
@@ -307,6 +208,12 @@ public class Controller {
         clienti.add(new Client(1,"Mama" ,10, "aici"));
         clienti.add(new Client(2, "Andrei", 15, "la tine"));
         clienti.add(new Client(3, "David", 70, "la mine"));
+
+        ///to check scroll works
+        for (int i = 4; i<= 150; i++)
+        {
+            clienti.add(new Client(i, "Andrei" + i, 10 * i, "ceva"));
+        }
 
         return clienti;
     }
@@ -322,4 +229,37 @@ public class Controller {
 
 
 
+
+    void populateTheTabel(JTable table, ArrayList<?> list)
+    {
+        DefaultTableModel model = new DefaultTableModel();
+        table.setModel(model);
+
+        Class<?> clazz = list.get(0).getClass();
+        Field[] fields = clazz.getDeclaredFields();
+
+        ///makes the header
+        for (Field field : fields) {
+            String name = field.getName();
+            model.addColumn(name);
+        }
+
+        ///populate the table with clients
+        for (Object obj : list)
+        {
+            Vector<Object> row = new Vector<>();
+            for (Field field : fields) {
+                field.setAccessible(true);
+                try {
+                    Object value = field.get(obj);
+                    row.add(value);
+                } catch (IllegalAccessException exception) {
+                    exception.printStackTrace();
+                }
+            }
+            model.addRow(row);
+        }
+    }
+
+    
 }
