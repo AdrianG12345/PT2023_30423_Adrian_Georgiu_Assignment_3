@@ -125,18 +125,41 @@ public class ViewClient extends JFrame{
     }
 
     public String getNameTextField() {
+        if (nameTextField.getText().equals(""))
+            return null;
         return nameTextField.getText();
     }
 
     public int getIdTextField() {
-        return Integer.parseInt(idTextField.getText());
+//        if (idTextField.getText().equals(""))
+//            return -1;
+//        return Integer.parseInt(idTextField.getText());
+        try
+        {
+            return Integer.parseInt(idTextField.getText());
+        }catch(Exception e)
+        {
+            return -1;
+        }
     }
 
     public int getAgeTextField() {
-        return Integer.parseInt(ageTextField.getText());
+//        if (ageTextField.getText().equals(""))
+//            return -1;
+//        return Integer.parseInt(ageTextField.getText());
+        try
+        {
+            return Integer.parseInt(ageTextField.getText());
+        }
+        catch(Exception e)
+        {
+            return -1;
+        }
     }
 
     public String getAddressTextField() {
+        if (addressTextField.getText().equals(""))
+            return null;
         return addressTextField.getText();
     }
 }

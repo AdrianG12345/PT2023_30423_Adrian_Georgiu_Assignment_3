@@ -5,10 +5,7 @@ import mvc.models.ConnectionFactory;
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.*;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -37,9 +34,9 @@ public class AbstractDAO<T> {
 
     public List<T> findAll() {
         // TODO:
-        Connection connection = null;
-        PreparedStatement statement = null;
-        ResultSet resultSet = null;
+        Connection connection;
+        PreparedStatement statement;
+        ResultSet resultSet;
         String query = "SELECT * FROM " + type.getSimpleName();
         try
         {
@@ -55,7 +52,31 @@ public class AbstractDAO<T> {
         return null;
     }
 
-    public T findById(int id) {
+    public int findById(int id) {///checks to see if it exists
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+        String query = createSelectQuery("id");
+        try {
+            connection = ConnectionFactory.getConnection();
+            statement = connection.prepareStatement(query);
+            statement.setInt(1, id);
+            resultSet = statement.executeQuery();
+
+            List<T> list = createObjects(resultSet);
+            if (list.size() != 0)
+                return 1;
+            return 0;
+        } catch (SQLException e) {
+            LOGGER.log(Level.WARNING, type.getName() + "DAO:findById " + e.getMessage());
+        } finally {
+            ConnectionFactory.close(resultSet);
+            ConnectionFactory.close(statement);
+            ConnectionFactory.close(connection);
+        }
+        return 0;
+    }
+    public T findByIdObject(int id) {///checks to see if it exists
         Connection connection = null;
         PreparedStatement statement = null;
         ResultSet resultSet = null;
@@ -118,14 +139,129 @@ public class AbstractDAO<T> {
         return list;
     }
 
-    public T insert(T t) {
+    public T insert(T t) {///add?
         // TODO:
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+        String query = "INSERT INTO " + type.getSimpleName() + "  (";
+        try {
+            connection = ConnectionFactory.getConnection();
+            Field[] fields = type.getDeclaredFields();
+            for (int i = 1; i < fields.length; i++)///starting from 1 to avoid id
+            {
+                if (fields[i].getName().equals("id"))
+                    continue;
+                if (i > 1)
+                    query += ",";
+                query += fields[i].getName();
+            }
+            query += ") values (";
+            for (int i = 1; i < fields.length; i++) {
+                if (i > 1) {
+                    query += ",";
+                }
+                query += "?";
+            }
+            query += ")";
+
+            statement = connection.prepareStatement(query);
+
+            int parameterIndex = 1;
+            for (Field field : fields) {
+                if (field.getName().equals("id"))
+                    continue;
+                field.setAccessible(true);
+                statement.setObject(parameterIndex++, field.get(t));
+            }
+
+            statement.executeUpdate();
+        } catch (SQLException | IllegalAccessException e) {
+            LOGGER.log(Level.WARNING, type.getName() + "DAO:insert " + e.getMessage());
+        }
+
         return t;
     }
 
-    public T update(T t) {
+    public T update(T t) {///edit?
         // TODO:
+        //UPDATE users
+//            SET name = 'John', age = 30
+//            WHERE id = 7;
+        Connection connection = null;
+        PreparedStatement statement = null;
+        String query = "UPDATE " + type.getSimpleName() + " SET ";
+
+        // get all the fields of the object
+        Field[] fields = type.getDeclaredFields();
+
+        // append each field name with a '?' placeholder to the query string
+        for (Field field : fields) {
+            if (field.getName().equals("id"))
+                continue;
+            query += field.getName() + " = ?, ";
+        }
+
+        // remove the last comma and space
+        query = query.substring(0, query.length() - 2);
+
+        // append the WHERE clause to the query string
+        query += " WHERE id = ?";
+
+        try {
+            connection = ConnectionFactory.getConnection();
+            statement = connection.prepareStatement(query);
+
+            // set the values of the object's fields as parameters in the prepared statement
+            int i = 1;
+            for (Field field : fields) {
+                if (field.getName().equals("id"))
+                    continue;
+                field.setAccessible(true);
+                Object value = field.get(t);
+                statement.setObject(i, value);
+                i++;
+            }
+
+            // set the value of the id field as the last parameter in the prepared statement
+            Field idField = type.getDeclaredField("id");
+            idField.setAccessible(true);
+            Object idValue = idField.get(t);
+            statement.setObject(i, idValue);
+
+            //execute the statement
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            LOGGER.log(Level.WARNING, type.getName() + "DAO:update " + e.getMessage());
+        } catch (IllegalAccessException e) {
+            LOGGER.log(Level.WARNING, type.getName() + "DAO:update " + e.getMessage());
+        } catch (NoSuchFieldException e) {
+            LOGGER.log(Level.WARNING, type.getName() + "DAO:update " + e.getMessage());
+        }
         return t;
+    }
+
+    public void deleteById(int id)
+    {
+//            DELETE FROM users
+//            WHERE id = 7;
+
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+        String query = "DELETE FROM " + type.getSimpleName() + " WHERE id = ?";
+        try
+        {
+            connection = ConnectionFactory.getConnection();
+            statement = connection.prepareStatement(query);
+            statement.setInt(1, id);
+
+            statement.executeUpdate();
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
 }

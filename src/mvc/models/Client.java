@@ -1,7 +1,7 @@
 package mvc.models;
 
 public class Client {
-    private int idClient;
+    private int id;
     private String name;
     private int age;
     private String address;
@@ -9,12 +9,14 @@ public class Client {
     public Client(int id, String name, int age, String address)
     {
         this.address = address;
-        this.idClient = id;
+        this.id = id;
         this.age = age;
         this.name = name;
     }
-    public Client(String name, int age)
+
+    public Client(String name, int age, String address)
     {
+        this.address = address;
         this.age = age;
         this.name = name;
     }
@@ -23,12 +25,12 @@ public class Client {
 
     }
 
-    public int getIdClient() {
-        return idClient;
+    public int getId() {
+        return id;
     }
 
-    public void setIdClient(int idClient) {
-        this.idClient = idClient;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() {

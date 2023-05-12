@@ -1,8 +1,8 @@
 package mvc.dataAccess;
 
-import mvc.models.Order;
+import mvc.models.Orders;
 
-public class OrderDAO extends AbstractDAO<Order> {
+public class OrderDAO extends AbstractDAO<Orders> {
     public OrderDAO()
     {
 

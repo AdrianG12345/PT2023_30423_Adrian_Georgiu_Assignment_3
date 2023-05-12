@@ -92,4 +92,20 @@ public class ViewOrder extends JFrame {
     public JTable getTable() {
         return table;
     }
+
+    public int getClientIdTextField() {
+        return Integer.parseInt(clientIdTextField.getText());
+    }
+
+
+
+    public int getProductIdTextField() {
+        return Integer.parseInt(productIdTextField.getText());
+    }
+
+    public int getQuantityTextField() {
+        return Integer.parseInt(quantityTextField.getText());
+    }
+
+
 }
