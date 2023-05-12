@@ -14,9 +14,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Field;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Vector;
 
@@ -44,10 +42,9 @@ public class Controller {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            System.out.println("S-A APASAT PRODUCT");
-
             viewProduct = new ViewProduct();
             viewProduct.setVisible(true);
+
             viewProduct.addProduct(new ProductAdd());
             viewProduct.editProduct(new ProductEdit());
             viewProduct.deleteProduct(new ProductDelete());
@@ -119,8 +116,6 @@ public class Controller {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            System.out.println("S-A APASAT ORDER");
-
             viewOrder = new ViewOrder();
             viewOrder.setVisible(true);
 
@@ -167,10 +162,9 @@ public class Controller {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            System.out.println("S-A APASAT Client");
-
             viewClient = new ViewClient();
             viewClient.setVisible(true);
+
             viewClient.addLisneter(new ClientAddListener());
             viewClient.editListener(new ClientEditListener());
             viewClient.deleteListener(new ClientDeleteListener());
@@ -182,6 +176,29 @@ public class Controller {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+//            UPDATE users
+//            SET name = 'John', age = 30
+//            WHERE id = 7;
+            try{
+                Connection connection = databaseConnection.getConnection();
+                String sql = "UPDATE client SET name = ?, age = ?, address = ? WHERE idClient = ?";
+                PreparedStatement statement = connection.prepareStatement(sql);
+                statement.setString(1, viewClient.getNameTextField());
+                statement.setInt(2, viewClient.getAgeTextField());
+                statement.setString(3, viewClient.getAddressTextField());
+                statement.setInt(4, viewClient.getIdTextField());
+                int rowsUpdated = statement.executeUpdate();
+                if (rowsUpdated > 0) {
+                    System.out.println("Row with id = 7 updated successfully.");
+                } else {
+                    System.out.println("No rows were updated.");
+                }
+            }
+            catch(Exception ex)
+            {
+                ex.printStackTrace();
+            }
+
 
         }
     }
@@ -190,7 +207,25 @@ public class Controller {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-
+//            DELETE FROM users
+//            WHERE id = 7;
+            try{
+                Connection connection = databaseConnection.getConnection();
+                String sql = "DELETE FROM client WHERE idClient = ?";
+                PreparedStatement statement = connection.prepareStatement(sql);
+                System.out.println(viewClient.getIdTextField());
+                statement.setInt(1, viewClient.getIdTextField());
+                int rowsDeleted = statement.executeUpdate();
+                if (rowsDeleted > 0) {
+                    System.out.println("Row with id = 7 deleted successfully.");
+                } else {
+                    System.out.println("No rows were deleted.");
+                }
+            }
+            catch(Exception ex)
+            {
+                ex.printStackTrace();
+            }
         }
     }
 
@@ -203,8 +238,6 @@ public class Controller {
             ArrayList<Client> clients;
             clients = getClients();
 
-            System.out.println(clients.size());
-
             JTable table = viewClient.getTable();
             populateTheTabel(table, clients);
         }
@@ -212,16 +245,6 @@ public class Controller {
     ArrayList<Client> getClients()
     {
         ArrayList<Client> clienti = new ArrayList<>();
-
-//        clienti.add(new Client(1,"Mama" ,10, "aici"));
-//        clienti.add(new Client(2, "Andrei", 15, "la tine"));
-//        clienti.add(new Client(3, "David", 70, "la mine"));
-//
-//        ///to check scroll works
-//        for (int i = 4; i<= 150; i++)
-//        {
-//            clienti.add(new Client(i, "Andrei" + i, 10 * i, "ceva"));
-//        }
 
         try{
             Connection connection = databaseConnection.getConnection();
@@ -233,7 +256,6 @@ public class Controller {
             String address = new String();
             int id;
             int age;
-
             while (result.next())
             {
                 id = Integer.parseInt(result.getString(1));
@@ -243,9 +265,6 @@ public class Controller {
 
                 clienti.add(new Client(id, name, age, address));
             }
-
-
-
         }
         catch (Exception ex)
         {
@@ -259,12 +278,22 @@ public class Controller {
     {
         @Override
         public void actionPerformed(ActionEvent e) {
+            try {
+                Connection connection = databaseConnection.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement("insert into client ( name, age, address)" + "values ( ?, ?, ?)");
 
+                preparedStatement.setString(1, viewClient.getNameTextField());
+                preparedStatement.setInt(2, viewClient.getAgeTextField());
+                preparedStatement.setString(3, viewClient.getAddressTextField());
+
+                preparedStatement.executeUpdate();
+
+                System.out.println("SUCCES!");
+            } catch (Exception ex) {
+                System.out.println("EROARE");
+            }
         }
     }
-
-
-
 
 
     void populateTheTabel(JTable table, ArrayList<?> list)
