@@ -1,9 +1,9 @@
 package mvc.bussinessLogic;
 
-import mvc.models.Client;
-import mvc.models.DatabaseConnection;
-import mvc.models.Order;
-import mvc.models.Product;
+import mvc.dataAccess.ClientDAO;
+import mvc.dataAccess.OrderDAO;
+import mvc.dataAccess.ProductDAO;
+import mvc.models.*;
 import mvc.presentation.View;
 import mvc.presentation.ViewClient;
 import mvc.presentation.ViewOrder;
@@ -11,11 +11,13 @@ import mvc.presentation.ViewProduct;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Field;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 public class Controller {
@@ -25,6 +27,9 @@ public class Controller {
     private ViewClient viewClient;
     private ViewOrder viewOrder;
     private ViewProduct viewProduct;
+    private ClientDAO clientDAO;
+    private OrderDAO orderDAO;
+    private ProductDAO productDAO;
 
 
 
@@ -32,6 +37,10 @@ public class Controller {
     public Controller(View view, DatabaseConnection databaseConnection) {
         this.view = view;
         this.databaseConnection = databaseConnection;
+
+        this.clientDAO = new ClientDAO();
+        this.orderDAO = new OrderDAO();
+        this.productDAO = new ProductDAO();
 
         this.view.addOrderListener(new OrderListener());
         this.view.addProductListener(new ProductListener());
@@ -82,7 +91,7 @@ public class Controller {
             ///show the products
             JTable table = viewProduct.getTable();
             ArrayList<Product> products = getProducts();
-            populateTheTabel(table, products);
+            //populateTheTabel(table, products);
         }
     }
     ArrayList<Product> getProducts()
@@ -139,7 +148,7 @@ public class Controller {
         public void actionPerformed(ActionEvent e) {
             ArrayList<Order> orders = getOrders();
             JTable table = viewOrder.getTable();
-            populateTheTabel(table, orders);
+            //populateTheTabel(table, orders);
         }
     }
     ArrayList<Order> getOrders()
@@ -180,7 +189,7 @@ public class Controller {
 //            SET name = 'John', age = 30
 //            WHERE id = 7;
             try{
-                Connection connection = databaseConnection.getConnection();
+                Connection connection = ConnectionFactory.getConnection();
                 String sql = "UPDATE client SET name = ?, age = ?, address = ? WHERE idClient = ?";
                 PreparedStatement statement = connection.prepareStatement(sql);
                 statement.setString(1, viewClient.getNameTextField());
@@ -210,7 +219,7 @@ public class Controller {
 //            DELETE FROM users
 //            WHERE id = 7;
             try{
-                Connection connection = databaseConnection.getConnection();
+                Connection connection = ConnectionFactory.getConnection();
                 String sql = "DELETE FROM client WHERE idClient = ?";
                 PreparedStatement statement = connection.prepareStatement(sql);
                 System.out.println(viewClient.getIdTextField());
@@ -235,41 +244,41 @@ public class Controller {
         @Override
         public void actionPerformed(ActionEvent e) {
             ///shows the clients
-            ArrayList<Client> clients;
+            List<Client> clients;
             clients = getClients();
 
             JTable table = viewClient.getTable();
             populateTheTabel(table, clients);
         }
     }
-    ArrayList<Client> getClients()
+    List<Client> getClients()
     {
-        ArrayList<Client> clienti = new ArrayList<>();
-
-        try{
-            Connection connection = databaseConnection.getConnection();
-            String sql = "SELECT * FROM client";
-            Statement statement = connection.createStatement();
-            ResultSet result = statement.executeQuery(sql);
-
-            String name = new String();
-            String address = new String();
-            int id;
-            int age;
-            while (result.next())
-            {
-                id = Integer.parseInt(result.getString(1));
-                name = result.getString(2);
-                age = Integer.parseInt(result.getString(3));
-                address = result.getString(4);
-
-                clienti.add(new Client(id, name, age, address));
-            }
-        }
-        catch (Exception ex)
-        {
-            System.out.println("EROARE EXCEPTION!");
-        }
+        //ArrayList<Client> clienti = new ArrayList<>();
+        List<Client> clienti = clientDAO.findAll();
+//        try{
+//            Connection connection = ConnectionFactory.getConnection();
+//            String sql = "SELECT * FROM client";
+//            Statement statement = connection.createStatement();
+//            ResultSet result = statement.executeQuery(sql);
+//
+//            String name = new String();
+//            String address = new String();
+//            int id;
+//            int age;
+//            while (result.next())
+//            {
+//                id = Integer.parseInt(result.getString(1));
+//                name = result.getString(2);
+//                age = Integer.parseInt(result.getString(3));
+//                address = result.getString(4);
+//
+//                clienti.add(new Client(id, name, age, address));
+//            }
+//        }
+//        catch (Exception ex)
+//        {
+//            System.out.println("EROARE EXCEPTION!");
+//        }
 
         return clienti;
     }
@@ -279,7 +288,7 @@ public class Controller {
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                Connection connection = databaseConnection.getConnection();
+                Connection connection = ConnectionFactory.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement("insert into client ( name, age, address)" + "values ( ?, ?, ?)");
 
                 preparedStatement.setString(1, viewClient.getNameTextField());
@@ -296,7 +305,7 @@ public class Controller {
     }
 
 
-    void populateTheTabel(JTable table, ArrayList<?> list)
+    void populateTheTabel(JTable table, List<?> list)
     {
         DefaultTableModel model = new DefaultTableModel();
         table.setModel(model);
