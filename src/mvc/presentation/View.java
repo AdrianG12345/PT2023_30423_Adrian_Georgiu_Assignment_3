@@ -5,9 +5,17 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionListener;
 
+/**
+ * Main view that represents the first menu the user has
+ */
 public class View extends JFrame {
 
     private JPanel contentPane;
+    /**
+     * each button opens a new window that lets the user do operations
+     * on the respective table
+     * such as product, client, orders
+     */
     private JButton productButton;
 
     private JButton clientButton;
@@ -47,6 +55,10 @@ public class View extends JFrame {
         this.setVisible(true);
     }
 
+    /**
+     * normal listeners for the buttons
+     * @param action
+     */
     public void addOrderListener(ActionListener action) {
         this.orderButton.addActionListener(action);
     }

@@ -32,6 +32,9 @@ public class AbstractDAO<T> {
         return sb.toString();
     }
 
+    /**
+     * @return a list of all entities of type T found in the database
+     */
     public List<T> findAll() {
         // TODO:
         Connection connection;
@@ -52,6 +55,11 @@ public class AbstractDAO<T> {
         return null;
     }
 
+    /**
+     * finds the entity in the database that has the id = to the param id
+     * @param id
+     * @return 1 in case it exists or 0 if it does not exist
+     */
     public int findById(int id) {///checks to see if it exists
         Connection connection = null;
         PreparedStatement statement = null;
@@ -76,6 +84,11 @@ public class AbstractDAO<T> {
         }
         return 0;
     }
+
+    /**
+     * @param id
+     * @return the object of type T with the id given as parametere
+     */
     public T findByIdObject(int id) {///checks to see if it exists
         Connection connection = null;
         PreparedStatement statement = null;
@@ -139,6 +152,11 @@ public class AbstractDAO<T> {
         return list;
     }
 
+    /**
+     * inserts in its table the element t
+     * @param t element that will be inserted into the table
+     * @return irelevant
+     */
     public T insert(T t) {///add?
         // TODO:
         Connection connection = null;
@@ -183,6 +201,13 @@ public class AbstractDAO<T> {
         return t;
     }
 
+    /**
+     * edits in the table the element with the id given in the param.id field
+     * and updates the rest of the elements to the rest of the elements
+     * in the parameter fields
+     * @param t
+     * @return
+     */
     public T update(T t) {///edit?
         // TODO:
         //UPDATE users
@@ -241,6 +266,10 @@ public class AbstractDAO<T> {
         return t;
     }
 
+    /**
+     * deletes the entity in the table with the id given in the paramaeter
+     * @param id
+     */
     public void deleteById(int id)
     {
 //            DELETE FROM users

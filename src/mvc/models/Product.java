@@ -1,5 +1,8 @@
 package mvc.models;
 
+/**
+ * Product object that represents the product table in my database
+ */
 public class Product {
     private int id;
     private String name;

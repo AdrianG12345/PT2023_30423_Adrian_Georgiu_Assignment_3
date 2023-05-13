@@ -1,5 +1,8 @@
 package mvc.models;
 
+/**
+ * Client object that represents the table client in my database
+ */
 public class Client {
     private int id;
     private String name;

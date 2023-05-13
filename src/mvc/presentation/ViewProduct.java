@@ -5,6 +5,9 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionListener;
 
+/**
+ * the interface for operations on the product table
+ */
 public class ViewProduct extends JFrame {
     private JPanel contentPane;
     private JTextField nameTextField;
@@ -121,18 +124,47 @@ public class ViewProduct extends JFrame {
     }
 
     public String getNameTextField() {
+        if (nameTextField.getText().equals(""))
+            return null;
         return nameTextField.getText();
     }
-
+    /**
+     *
+     * @return the integer value of the id OR -1 in case the string is not a number
+     */
     public int getIdTextField() {
-        return Integer.parseInt(idTextField.getText());
-    }
+        try
+        {
+            return Integer.parseInt(idTextField.getText());
+        }catch(Exception e)
+        {
+            return -1;
+        }
 
+    }
+    /**
+     *
+     * @return the integer value of the price OR -1 in case the string is not a number
+     */
     public double getPriceTextField() {
-        return Double.parseDouble(priceTextField.getText());
+        try
+        {
+            return Double.parseDouble(priceTextField.getText());
+        }catch(Exception e) {
+            return -1;
+        }
     }
-
+    /**
+     *
+     * @return the integer value of the quantity OR -1 in case the string is not a number
+     */
     public int getQuantityTextField() {
-        return Integer.parseInt(quantityTextField.getText());
+        try{
+            return Integer.parseInt(quantityTextField.getText());
+        }catch(Exception e)
+        {
+            return -1;
+        }
+
     }
 }

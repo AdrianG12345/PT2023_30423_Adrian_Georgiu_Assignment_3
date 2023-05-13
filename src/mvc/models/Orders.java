@@ -1,5 +1,8 @@
 package mvc.models;
 
+/**
+ * Orders object that represents the orders table in my database
+ */
 public class Orders {
     private int id;
     private int clientId;///foreign key

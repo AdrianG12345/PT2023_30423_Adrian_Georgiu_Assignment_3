@@ -5,6 +5,9 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionListener;
 
+/**
+ * the interface for operations on the orders table
+ */
 public class ViewOrder extends JFrame {
     private JPanel contentPane;
     private JTable table;
@@ -92,19 +95,44 @@ public class ViewOrder extends JFrame {
     public JTable getTable() {
         return table;
     }
-
+    /**
+     *
+     * @return the integer value of the id OR -1 in case the string is not a number
+     */
     public int getClientIdTextField() {
-        return Integer.parseInt(clientIdTextField.getText());
+        try
+        {
+            return Integer.parseInt(clientIdTextField.getText());
+        }catch(Exception e)
+        {
+            return -1;
+        }
+
     }
-
-
-
+    /**
+     *
+     * @return the integer value of the id OR -1 in case the string is not a number
+     */
     public int getProductIdTextField() {
-        return Integer.parseInt(productIdTextField.getText());
+        try
+        {
+            return Integer.parseInt(productIdTextField.getText());
+        }catch(Exception e)
+        {
+            return -1;
+        }
+
     }
 
     public int getQuantityTextField() {
-        return Integer.parseInt(quantityTextField.getText());
+        try
+        {
+            return Integer.parseInt(quantityTextField.getText());
+        }catch(Exception e)
+        {
+            return -1;
+        }
+
     }
 
 

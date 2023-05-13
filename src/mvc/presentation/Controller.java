@@ -15,27 +15,26 @@ import java.sql.*;
 import java.util.List;
 import java.util.Vector;
 
+/**
+ * the classs which controls all the elements of the GUI
+ * and acceses all the input data
+ * and pressed buttons
+ * and everything of the GUI
+ * uses the BUssinessLogic class to make all the things
+ */
 public class Controller {
 
     private View view;
     private ViewClient viewClient;
     private ViewOrder viewOrder;
     private ViewProduct viewProduct;
-    private ClientDAO clientDAO;
-    private OrderDAO orderDAO;
-    private ProductDAO productDAO;
     private BussinessLogic logica;
-
-
 
 
     public Controller(View view) {
         this.view = view;
 
         logica = new BussinessLogic();
-        this.clientDAO = new ClientDAO();
-        this.orderDAO = new OrderDAO();
-        this.productDAO = new ProductDAO();
 
         this.view.addOrderListener(new OrderListener());
         this.view.addProductListener(new ProductListener());
@@ -63,8 +62,7 @@ public class Controller {
             String name = viewProduct.getNameTextField();
             double price = viewProduct.getPriceTextField();
             int q = viewProduct.getQuantityTextField();
-            Product p = new Product(name, price, q);
-            productDAO.insert(p);
+            logica.insertProduct(name, price, q);
         }
     }
 
@@ -74,8 +72,7 @@ public class Controller {
         @Override
         public void actionPerformed(ActionEvent e) {
             int id = viewProduct.getIdTextField();
-            productDAO.deleteById(id);
-
+            logica.deleteProduct(id);
         }
     }class ProductEdit implements ActionListener
     {
@@ -86,9 +83,7 @@ public class Controller {
             String name = viewProduct.getNameTextField();
             double price = viewProduct.getPriceTextField();
             int q = viewProduct.getQuantityTextField();
-            Product p = new Product(id ,name, price, q);
-
-            productDAO.update(p);
+            logica.editProduct(id, name, price, q);
         }
     }
     class ProductViewListener implements ActionListener
@@ -126,34 +121,9 @@ public class Controller {
         public void actionPerformed(ActionEvent e) {
             ////VA TREBUIE TERMINAT MAI INCOLO
             int cId = viewOrder.getClientIdTextField();//id needs to be checked that exists
-            int ok = clientDAO.findById(cId);
-            if (ok == 0)
-            {
-                System.out.println("NU EXISTA ACEL CLIENT");
-                return;
-            }
             int pId = viewOrder.getProductIdTextField();//same here
-            ok = productDAO.findById(pId);
-            if (ok == 0)
-            {
-                System.out.println("NU EXISTA ACEL PRODUS IN BAZA DE DATE");
-                return;
-            }
-
             int q = viewOrder.getQuantityTextField();//qty must be checked
-            Product product = productDAO.findByIdObject(pId);
-            int currentQuantityInStock = product.getQuantity();
-            if (q > currentQuantityInStock)
-            {
-                System.out.println("NU EXISTA SUFICIENT IN STOC");
-                return;
-            }
-
-            Orders o = new Orders(cId, pId, q);
-            orderDAO.insert(o);
-
-            product.setQuantity(product.getQuantity() - q);
-            productDAO.update(product);
+            logica.insertOrder(cId, pId, q);
         }
     }
 

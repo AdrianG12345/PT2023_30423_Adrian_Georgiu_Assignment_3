@@ -5,6 +5,9 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionListener;
 
+/**
+ * the interface for operations on the client table
+ */
 public class ViewClient extends JFrame{
     private JPanel contentPane;
     private JTextField nameTextField;
@@ -130,6 +133,10 @@ public class ViewClient extends JFrame{
         return nameTextField.getText();
     }
 
+    /**
+     *
+     * @return the integer value of the id OR -1 in case the string is not a number
+     */
     public int getIdTextField() {
 //        if (idTextField.getText().equals(""))
 //            return -1;
